@@ -14,8 +14,20 @@ type BTree struct {
 	lock *sync.RWMutex //lock: to ensure the write operations are thread-safe
 }
 
+// Init a new BTree instance
+func NewBTree() *BTree {
+	return &BTree{
+		//To be optimized: degree could be a parameter for this function
+		tree: btree.New(32),
+		lock: new(sync.RWMutex),
+	}
+}
+
 // Implement the Put function in the Indexer interface, lock the write opertions when perform write
 func (bt *BTree) Put(key []byte, pos *data.LogRecordPos) bool {
+	if keyIsInvalid(key) {
+		return false
+	}
 	oneItem := &Item{
 		key: key,
 		pos: pos,
@@ -28,20 +40,27 @@ func (bt *BTree) Put(key []byte, pos *data.LogRecordPos) bool {
 
 // Implement the Delete function in the Indexer interface
 func (bt *BTree) Delete(key []byte) bool {
+	if keyIsInvalid(key) {
+		return false
+	}
 	oneItem := &Item{
 		key: key,
 	}
 	bt.lock.Lock()
 	oldRecord := bt.tree.Delete(oneItem)
+	bt.lock.Unlock()
 	if oldRecord == nil {
 		return false
 	}
-	bt.lock.Unlock()
+
 	return true
 }
 
 // Implement the Get function in the Indexer interface, Get method in Google BTree is thread safe
 func (bt *BTree) Get(key []byte) *data.LogRecordPos {
+	if keyIsInvalid(key) {
+		return nil
+	}
 	oneItem := &Item{
 		key: key,
 	}
