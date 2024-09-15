@@ -9,7 +9,7 @@ type IOManager interface {
 	// Write: write to the disk
 	Write([]byte) (int, error)
 
-	// Sync
+	// Sync: commits the current contents of the file to stable storage.
 	Sync() error
 
 	// Close: close the file
