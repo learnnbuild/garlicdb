@@ -12,3 +12,18 @@ type Indexer interface {
     Delete()
 }
 ```
+
+
+## Disk: IO Operations
+
+Standard IO should be supported at least. We can define an IO manger interface.
+
+```go
+type IOManager interface {
+    Read()
+    Write()
+    Sync()
+    Close()
+}
+```
+
